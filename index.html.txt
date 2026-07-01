@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>????</title>
+    <style>
+        body { background: #0b0f19; color: #fff; font-family: sans-serif; display: flex; height: 100vh; justify-content: center; align-items: center; margin: 0; }
+        .box { text-align: center; }
+        input { padding: 10px; border-radius: 5px; border: 1px solid #818cf8; background: #1e293b; color: #fff; font-size: 16px; text-align: center; }
+        button { padding: 10px 20px; border: none; background: #818cf8; color: #0b0f19; border-radius: 5px; cursor: pointer; margin-left: 10px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h3>??????? ??????? ?????, ????? ?????:</h3>
+        <input type="text" id="pass" placeholder="??????? ?????">
+        <button onclick="check()">?????</button>
+    </div>
+    <script>
+        function check() {
+            // ?????? 'batya2026' ?? ????? ???? ????????? ????? (?????????? ???????)
+            if (document.getElementById('pass').value.toLowerCase() === 'batya2026') {
+                window.location.href = 'poem.html'; 
+            } else {
+                alert('???????? ?????');
+            }
+        }
+    </script>
+</body>
+</html>

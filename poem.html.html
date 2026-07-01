@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Папе</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Атмосферный задний фон */
+        .background-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Экран приветствия / Кнопка включения */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0b0f19;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease, visibility 1s;
+        }
+
+        .start-btn {
+            background: transparent;
+            border: 2px solid #818cf8;
+            color: #818cf8;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            letter-spacing: 2px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        .start-btn:hover {
+            background: #818cf8;
+            color: #0b0f19;
+            box-shadow: 0 0 35px rgba(99, 102, 241, 0.6);
+            transform: scale(1.05);
+        }
+
+        .welcome-hint {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #64748b;
+            letter-spacing: 1px;
+        }
+
+        /* Контейнер со стихом */
+        .container {
+            max-width: 700px;
+            width: 100%;
+            padding: 60px 25px;
+            z-index: 2;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1.5s ease 0.5s, transform 1.5s ease 0.5s;
+        }
+
+        .container.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            font-weight: 600;
+            margin-bottom: 50px;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #ffffff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Стилизация строф */
+        .stanza {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.35rem;
+            line-height: 1.8;
+            margin-bottom: 45px;
+            color: #cbd5e1;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 1.2s ease, transform 1.2s ease;
+        }
+
+        .stanza.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Финальная подпись */
+        .signature {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+            color: #818cf8;
+            margin-top: 60px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 2s ease;
+        }
+
+        .signature.show {
+            opacity: 1;
+        }
+
+        /* Элемент управления музыкой (маленький плеер в углу) */
+        .audio-controls {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 10;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .audio-controls.visible {
+            opacity: 1;
+        }
+
+        .audio-controls svg {
+            width: 24px;
+            height: 24px;
+            fill: #818cf8;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .stanza { font-size: 1.15rem; line-height: 1.7; margin-bottom: 35px; }
+            .container { padding: 40px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-glow"></div>
+
+    <!-- Начальный экран для обхода блокировки автозвука браузерами -->
+    <div id="welcome-screen">
+        <button class="start-btn" onclick="startExperience()">ВКЛЮЧИТЬ ЗВУК И ЧИТАТЬ</button>
+        <p class="welcome-hint">Папа, нажми сюда</p>
+    </div>
+
+    <!-- Контейнер со стихом -->
+    <div class="container" id="main-content">
+        <h1>Для тебя, папа</h1>
+
+        <div class="stanza">
+            Я помню детство... Шумный, сонный двор,<br>
+            Других отцов, что за руку держали.<br>
+            А наш с тобой редкий разговор<br>
+            Мы прятали в глупых обидах.
+        </div>
+
+        <div class="stanza">
+            Мне так порой тебя недоставало,<br>
+            Когда ложился первый робкий снег,<br>
+            Когда казалось: целого мира мало,<br>
+            А нужен просто «мой» отрезок лет.
+        </div>
+
+        <div class="stanza">
+            Бывало больно, папа, не сдыхать,<br>
+            Смотреть, как время мчится поездами.<br>
+            Мы не умели толком обнимать,<br>
+            Возведя глухую стену между нами.
+        </div>
+
+        <div class="stanza">
+            Ты был в делах, я рос как дикий куст,<br>
+            И каждый прятал свой колючий взгляд.<br>
+            И этот дом был бесконечно пуст<br>
+            Без тех бесед, что не вернуть назад.
+        </div>
+
+        <div class="stanza">
+            Мне так хотелось тогда закричать:<br>
+            «Пойдём со мной! Посмотрим на машины!»<br>
+            Давай уедем, папа, хоть куда,<br>
+            Ведь мы с тобой едины, как вершины!»
+        </div>
+
+        <div class="stanza">
+            Хотел на речку, в душные гаражи,<br>
+            Учиться красить, забивать впотьмах...<br>
+            Но вместо этой настоящей лжи<br>
+            В маленьких сердцах копился холод.
+        </div>
+
+        <div class="stanza">
+            Мы упустили сотни тёплых дней,<br>
+            Растратили часы на тишину.<br>
+            И среди тысяч чуждых мне людей<br>
+            Я чувствовал лишь эту глубину.
+        </div>
+
+        <div class="stanza">
+            Как мало мы делились на двоих<br>
+            Своей тоской, успехом и мечтой...<br>
+            Застыл в губах неотвратимый стих,<br>
+            окутанный привычной немотой.
+        </div>
+
+        <div class="stanza">
+            Но видишь, пап... Обиды тают в прах,<br>
+            И шторм утих, оставив чистый холст.<br>
+            Я вижу свет теперь в твоих глазах,<br>
+            И между нами выстроился мост.
+        </div>
+
+        <div class="stanza">
+            Я так безумно рад, что этот lёд<br>
+            Сегодня треснул, обнажив тепло.<br>
+            Что наше время двинулось вперёд,<br>
+            И то, что наболело — утеклó.
+        </div>
+
+        <div class="stanza">
+            Теперь я знаю, как мне дорог ты,<br>
+            И как ценны минуты у костра.<br>
+            Хочу ломать привычные маршруты<br>
+            И говорить с тобой до утра.
+        </div>
+
+        <div class="stanza">
+            Хочу делить с тобой развлечения и дела,<br>
+            Смеяться вместе, спорить обо всём,<br>
+            Чтобы эта жизнь, что текла мимо нас,<br>
+            Осталась в прошлом за твоим плечом.
+        </div>
+
+        <div class="stanza">
+            Давай наверстаем каждый упущенный миг,<br>
+            Поедем в горы, выберем маршрут!<br>
+            Пусть этот честный, мой сыновний крик<br>
+            Разрушит стены, которые годами ждут своего часа.
+        </div>
+
+        <div class="stanza">
+            Спасибо, пап, за то, что мы смогли.<br>
+            За то, что нам стало «более-менее».<br>
+            Я за тебя пойду на край земли.<br>
+            Ты лучший папа. Я иду по твоим стопам.
+        </div>
+
+        <div class="signature" id="final-signature">Твой сын</div>
+    </div>
+
+    <!-- Кнопка музыки в углу -->
+    <div class="audio-controls" id="audio-toggle" onclick="toggleAudio()">
+        <svg id="icon-volume-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+        <svg id="icon-volume-off" viewBox="0 0 24 24" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+    </div>
+
+    <!-- Тег аудио (замени music.mp3 на имя своего файла песни) -->
+    <audio id="bg-audio" src="music.mp3" loop></audio>
+
+    <script>
+        const audio = document.getElementById('bg-audio');
+        const audioToggle = document.getElementById('audio-toggle');
+        const iconOn = document.getElementById('icon-volume-on');
+        const iconOff = document.getElementById('icon-volume-off');
+
+        function startExperience() {
+            // Прячем приветственный экран
+            const welcome = document.getElementById('welcome-screen');
+            welcome.style.opacity = '0';
+            setTimeout(() => {
+                welcome.style.visibility = 'hidden';
+            }, 1000);
+
+            // Показываем основной контейнер
+            const mainContent = document.getElementById('main-content');
+            mainContent.classList.add('visible');
+
+            // Запускаем музыку
+            audio.play().catch(err => console.log("Автоплей заблокирован, нужен клик по иконке: " + err));
+            audioToggle.classList.add('visible');
+
+            // Запускаем постепенное появление строф при скролле (и сразу первые проверяем)
+            setTimeout(revealStanzas, 600);
+            window.addEventListener('scroll', revealStanzas);
+        }
+
+        function revealStanzas() {
+            const stanzas = document.querySelectorAll('.stanza');
+            const triggerBottom = window.innerHeight * 0.85;
+
+            stanzas.forEach((stanza, index) => {
+                const stanzaTop = stanza.getBoundingClientRect().top;
+
+                if (stanzaTop < triggerBottom) {
+                    stanza.classList.add('show');
+                }
+            });
+
+            // Проверка для финальной подписи
+            const signature = document.getElementById('final-signature');
+            if (signature.getBoundingClientRect().top < window.innerHeight * 0.9) {
+                signature.classList.add('show');
+            }
+        }
+
+        function toggleAudio() {
+            if (audio.paused) {
+                audio.play();
+                iconOn.style.display = 'block';
+                iconOff.style.display = 'none';
+            } else {
+                audio.pause();
+                iconOn.style.display = 'none';
+                iconOff.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
