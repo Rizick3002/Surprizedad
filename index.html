@@ -87,13 +87,18 @@
     <audio id="bg-audio" src="music.mp3" loop></audio>
 
     <script>
-        const audio = document.getElementById('bg-audio');
+       <script>
+        // Вместо старой привязки, создаем аудио напрямую через JavaScript
+        let audio = new Audio();
+        audio.src = 'music.mp3';
+        audio.loop = true;
+        audio.preload = 'auto';
+
         const audioToggle = document.getElementById('audio-toggle');
         const iconOn = document.getElementById('icon-volume-on');
         const iconOff = document.getElementById('icon-volume-off');
 
         function checkPassword() {
-            // Пароль тут (batya2026)
             if (document.getElementById('pass').value.toLowerCase() === 'batya2026') {
                 const passScreen = document.getElementById('password-screen');
                 passScreen.style.opacity = '0';
@@ -101,6 +106,9 @@
                     passScreen.style.visibility = 'hidden'; 
                     const welcomeScreen = document.getElementById('welcome-screen');
                     welcomeScreen.style.display = 'flex';
+                    
+                    // Начинаем подгружать музло сразу после ввода пароля
+                    audio.load();
                 }, 1000);
             } else {
                 alert('Неверное слово');
@@ -115,8 +123,18 @@
             const mainContent = document.getElementById('main-content');
             mainContent.classList.add('visible');
 
-            // Жесткий запуск музыки после прямого клика по кнопке
-            audio.play().catch(err => console.log("Ошибка звука: " + err));
+            // Принудительно пинаем аудио на загрузку и воспроизведение
+            audio.load();
+            let playPromise = audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(_ => {
+                    console.log("Звук успешно запущен!");
+                }).catch(error => {
+                    console.log("Финальный блок блокировки: " + error);
+                });
+            }
+            
             audioToggle.classList.add('visible');
 
             setTimeout(revealStanzas, 600);
